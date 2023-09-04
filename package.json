@@ -1,0 +1,30 @@
+{
+  "name": "click-quick",
+  "version": "1.0.0",
+  "description": "Click Quick Online Game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OGFaisalN/Click-Quick.git"
+  },
+  "author": "Faisal N",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/OGFaisalN/Click-Quick/issues"
+  },
+  "homepage": "https://github.com/OGFaisalN/Click-Quick#readme",
+  "dependencies": {
+    "@nextui-org/react": "^2.1.10",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "framer-motion": "^10.16.2",
+    "shortid": "^2.2.16",
+    "socket.io": "^4.7.2"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.3"
+  }
+}

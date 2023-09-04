@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Welcome to my app</title>
+</head>
+
+<body>
+	<h1>Welcome to my app</h1>
+	<button color="primary" variant="contained" onClick="handleCreateRoom()">
+		Create a private room
+	</button>
+	<br />
+	<button color="secondary" variant="contained" onClick="handleJoinPublicRoom()">
+		Join a public room
+	</button>
+	<br />
+	<input type="text" id="roomCode" value="" onChange="handleInputChange()" />
+	<br />
+	<button variant="contained" onClick="handleJoinPrivateRoom()">
+		Join a private room
+	</button>
+	<h2>Game room: <h2 class="gameRoom"><%= roomId %></h2>
+	</h2>
+	<h3>Players:</h3>
+	<ul id="playersList">
+		<% players.forEach(player => { %>
+		<li><%= player %></li>
+		<% }); %>
+	</ul>
+	<h2>Room type: <%= roomType %></h2>
+	<h2>Your ID: <%= socket.id %></h2>
+	<h2>Rooms:</h2>
+	<ul id="roomsList">
+		<% rooms.forEach(room => { %>
+		<li><%= room %></li>
+		<% }); %>
+	</ul>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		const socket = io();
+		var roomId = <%= roomId %>;
+		var roomType = '<%= roomType %>';
+		var roomCode = '';
+		var players = <%= players %>;
+
+		socket.on('connect', () => {
+			console.log('Connected to server');
+		});
+
+		socket.on('new room', (type, id) => {
+			console.log(`New ${type} room created with ID ${id}`);
+			roomType = type;
+			roomId = id;
+			updateRoom();
+		});
+
+		socket.on('update players', (updatedPlayers) => {
+			console.log('Player list updated', updatedPlayers);
+			players = updatedPlayers;
+			renderPlayers();
+		});
+
+		function handleCreateRoom() {
+			socket.emit('create room', 'friends');
+		};
+
+		function handleJoinPublicRoom() {
+			socket.emit('join room', 'public');
+		};
+
+		function handleJoinPrivateRoom() {
+			socket.emit('join room', roomCode);
+		};
+
+		function handleInputChange() {
+			roomCode = document.getElementById('roomCode').value;
+		};
+
+		function renderPlayers() {
+			var playersList = document.getElementById('playersList');
+			playersList.innerHTML = '';
+			players.forEach((player) => {
+				var li = document.createElement('li');
+				li.innerText = player;
+				playersList.appendChild(li);
+			});
+		};
+
+		function updateRoom() {
+			document.querySelectorAll('.gameRoom').forEach(gameRoom => {
+				gameRoom.innerText = roomId;
+			});
+		};
+	</script>
+</body>
+
+</html>
