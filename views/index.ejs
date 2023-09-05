@@ -6,6 +6,23 @@
 </head>
 
 <body>
+	<header>
+		<div class="back">
+			<a href="index.html"><i class="fas fa-arrow-left"></i></a>
+		</div>
+		<div class="logo">
+			<img src="logo.png" />
+			<h1>Click Quick</h1>
+		</div>
+		<div class="bonuses">
+			<img src="bonus.png" />
+			<h2>Bonuses</h2>
+			<h3>Check available bonuses</h3>
+		</div>
+	</header>
+	<% if (error != null) { %>
+	<div id="error"><%= error %></div>
+	<% } %>
 	<h1>Welcome to my app</h1>
 	<button color="primary" variant="contained" onClick="handleCreateRoom()">
 		Create a private room
@@ -28,24 +45,30 @@
 		<li><%= player %></li>
 		<% }); %>
 	</ul>
-	<h2>Room type: <%= roomType %></h2>
+	<h2>Room type: <h2 class="roomType"><%= roomType %></h2>
+	</h2>
 	<h2>Your ID: <%= socket.id %></h2>
 	<h2>Rooms:</h2>
 	<ul id="roomsList">
-		<% rooms.forEach(room => { %>
-		<li><%= room %></li>
-		<% }); %>
+		<% for (const [key, value] of Object.entries(rooms)) { %>
+		<li><%= key %></li>
+		<% }; %>
 	</ul>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
+		window.onerror = function(e) {
+			document.getElementById('prompt').innerHTML = e.toString();
+		};
+
 		const socket = io();
-		var roomId = <%= roomId %>;
+		var roomId = '<%= roomId %>';
 		var roomType = '<%= roomType %>';
 		var roomCode = '';
-		var players = <%= players %>;
+		var players = <%- JSON.stringify(players) %>;
 
 		socket.on('connect', () => {
 			console.log('Connected to server');
+			socket.emit('join room', roomId);
 		});
 
 		socket.on('new room', (type, id) => {
@@ -70,7 +93,7 @@
 		};
 
 		function handleJoinPrivateRoom() {
-			socket.emit('join room', roomCode);
+			location.href = `/join/${roomCode}`;
 		};
 
 		function handleInputChange() {

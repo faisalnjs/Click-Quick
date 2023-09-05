@@ -10,15 +10,19 @@ var rooms = { public: [] };
 var roomId = 'public';
 var roomType = 'public';
 
-app.get('/:roomId', (req, res) => {
+app.get('/', (req, res) => {
+  res.render('index', { roomId, roomType, rooms, players: rooms.public || [], socket: io, error: null });
+});
+
+app.get('/join/:roomId', (req, res) => {
   if (req.params.roomId) {
     if (rooms[req.params.roomId]) {
-      res.render('index', { roomId: req.params.roomId, roomType: 'friends', roomCode, rooms, players: rooms[roomId] || [], socket: io, error: null });
+      res.render('index', { roomId: req.params.roomId, roomType: 'friends', rooms, players: rooms[roomId].toString() || [], socket: io, error: null });
     } else {
-      res.render('index', { roomId, roomType, roomCode, rooms, players: rooms.public || [], socket: io, error: "Room does not exist" });
+      res.render('index', { roomId, roomType, rooms, players: rooms.public || [], socket: io, error: "Room does not exist" });
     };
   } else {
-    res.render('index', { roomId, roomType, roomCode, rooms, players: rooms.public || [], socket: io, error: null });
+    res.redirect('/');
   };
 });
 
@@ -33,28 +37,19 @@ io.on('connection', (socket) => {
     io.to(roomId).emit('update players', rooms[roomId] || []);
   });
 
-  socket.on('new player', (type, id) => {
-    if (type === 'public') {
-      if (!rooms.public) {
-        rooms.public = [];
-      }
+  socket.on('join room', (id) => {
+    console.log(`New User: ${socket.id} -> ${id}`);
+    if (id === 'public') {
       if (!rooms.public.includes(socket.id)) {
         rooms.public.push(socket.id);
       };
-    } else if (type === 'friends') {
-      if (!id) {
-        roomId = shortid.generate();
-        socket.emit('new room', type, roomId);
-        rooms[roomId] = [];
-      };
+    } else {
       if (!rooms[roomId].includes(socket.id)) {
         rooms[roomId].push(socket.id);
       };
     };
-
     socket.join(roomId);
-    console.log(rooms);
-    io.to(roomId).emit('update players', rooms[roomId] || []);
+    io.to(roomId).emit('update players', ((id === 'public') ? rooms.public : rooms[roomId]));
   });
 
   socket.on('disconnect', () => {
