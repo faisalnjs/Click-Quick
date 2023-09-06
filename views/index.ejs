@@ -2,22 +2,51 @@
 <html>
 
 <head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no" />
+	<meta name="theme-color" content="#000000" />
 	<title>Welcome to my app</title>
+	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
+	<link rel="apple-touch-icon" sizes="76x76" href="../apple-icon.png" />
+	<link rel="android-chrome-192x192" href="../android-icon-192x192.png" />
+	<link rel="android-chrome-512x512" href="../android-icon-512x512.png" />
+	<link rel="stylesheet" href="../styles.css" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Urbanist:300,400,500,700&display=swap" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 </head>
 
 <body>
 	<header>
-		<div class="back">
-			<a href="index.html"><i class="fas fa-arrow-left"></i></a>
+		<div class="left">
+			<a class="back" onClick="history.back()">
+				<span class="material-symbols-outlined">
+					arrow_back
+				</span>
+			</a>
+			<a class="logo" href="/">
+				<img src="logo.jpeg" />
+				<h1>Click Quick</h1>
+			</a>
+			<a class="tokens" href="/tokens">
+				<img src="token.jpeg" />
+				<div>
+					<h3>Tokens</h3>
+					<h4>Claim free tokens</h4>
+				</div>
+			</a>
 		</div>
-		<div class="logo">
-			<img src="logo.png" />
-			<h1>Click Quick</h1>
-		</div>
-		<div class="bonuses">
-			<img src="bonus.png" />
-			<h2>Bonuses</h2>
-			<h3>Check available bonuses</h3>
+		<div class="right">
+			<div class="search">
+				<input type="text" placeholder="Search" />
+				<i class="fas fa-search"></i>
+			</div>
+			<div class="profile">
+				<img src="profile.jpeg" />
+				<div>
+					<h3>John Doe</h3>
+					<h4>View profile</h4>
+				</div>
+			</div>
 		</div>
 	</header>
 	<% if (error != null) { %>

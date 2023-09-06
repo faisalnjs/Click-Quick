@@ -5,6 +5,7 @@ const io = require('socket.io')(http);
 const shortid = require('shortid');
 
 app.set('view engine', 'ejs');
+app.use(express.static('public'));
 
 var rooms = { public: [] };
 var roomId = 'public';

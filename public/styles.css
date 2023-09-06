@@ -1,0 +1,87 @@
+html {
+    font-family: 'Urbanist', sans-serif;
+    scroll-behavior: smooth;
+    background: linear-gradient(45deg, #0c013e, #25013e);
+    color: white;
+}
+
+body {
+    height: calc(100vh - 70px);
+    margin: 0;
+    margin-top: 70px;
+    padding: 50px;
+    box-sizing: border-box;
+    display: grid;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+header {
+    width: calc(100vw - 100px);
+    height: 70px;
+    background: #ffffff4f;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+    z-index: 100;
+    padding: 0 50px;
+}
+
+header .left, header .right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 25px;
+}
+
+header img {
+    height: 45px;
+    border-radius: 100%;
+    box-shadow: #d900ff 0px 0px 15px 0px;
+}
+
+header .back {
+    background: linear-gradient(45deg, #0c013ea1, #25013ea1);
+    border-radius: 100%;
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+header .logo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}
+
+header .tokens {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+    height: 70px;
+    padding: 0 25px;
+    background: linear-gradient(45deg, #0c013ea1, #25013ea1);
+}
+
+header .tokens div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0px;
+}
+
+header .tokens div * {
+    margin: 0;
+}
