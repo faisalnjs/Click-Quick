@@ -4,31 +4,31 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no" />
-	<meta name="theme-color" content="#000000" />
-	<title>Welcome to my app</title>
+	<meta name="theme-color" content="#d900ff" />
+	<title>Click Quick</title>
 	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
 	<link rel="apple-touch-icon" sizes="76x76" href="../apple-icon.png" />
 	<link rel="android-chrome-192x192" href="../android-icon-192x192.png" />
 	<link rel="android-chrome-512x512" href="../android-icon-512x512.png" />
 	<link rel="stylesheet" href="../styles.css" />
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Urbanist:300,400,500,700&display=swap" />
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
 </head>
 
 <body>
-	<header>
+	<header class="glass">
 		<div class="left">
-			<a class="back" onClick="history.back()">
-				<span class="material-symbols-outlined">
+			<a class="back glass" onClick="history.back()">
+				<span class="material-symbols-rounded">
 					arrow_back
 				</span>
 			</a>
 			<a class="logo" href="/">
-				<img src="logo.jpeg" />
+				<img class="glass" src="../../logo.jpeg" />
 				<h1>Click Quick</h1>
 			</a>
-			<a class="tokens" href="/tokens">
-				<img src="token.jpeg" />
+			<a class="tokens" onClick="toggleTokens()">
+				<img src="../../token.jpeg" />
 				<div>
 					<h3>Tokens</h3>
 					<h4>Claim free tokens</h4>
@@ -36,53 +36,97 @@
 			</a>
 		</div>
 		<div class="right">
-			<div class="search">
-				<input type="text" placeholder="Search" />
-				<i class="fas fa-search"></i>
-			</div>
-			<div class="profile">
-				<img src="profile.jpeg" />
-				<div>
-					<h3>John Doe</h3>
-					<h4>View profile</h4>
-				</div>
-			</div>
+			<a class="chat glass" onClick="toggleChat()">
+				<span class="material-symbols-rounded">
+					chat
+				</span>
+			</a>
+			<a class="notifications glass" onClick="toggleNotifications()">
+				<span class="material-symbols-rounded">
+					notifications
+				</span>
+			</a>
+			<% if (!session.loggedIn) { %>
+			<a href="/login">
+				<button class="glass">Log in / Sign up</button>
+			</a>
+			<% } %>
+			<a href="/">
+				<button>Play as <% if (session.account.firstname) { %><%= session.account.firstname %><% } else { %>Guest<% } %></button>
+			</a>
+			<a class="user" onClick="toggleProfile()">
+				<img src="<% if (session.account.profileimg) { %><%= session.account.profileimg %><% } else { %>../../user.jpeg<% } %>" />
+			</a>
 		</div>
 	</header>
 	<% if (error != null) { %>
 	<div id="error"><%= error %></div>
 	<% } %>
-	<h1>Welcome to my app</h1>
-	<button color="primary" variant="contained" onClick="handleCreateRoom()">
-		Create a private room
-	</button>
-	<br />
-	<button color="secondary" variant="contained" onClick="handleJoinPublicRoom()">
-		Join a public room
-	</button>
-	<br />
-	<input type="text" id="roomCode" value="" onChange="handleInputChange()" />
-	<br />
-	<button variant="contained" onClick="handleJoinPrivateRoom()">
-		Join a private room
-	</button>
-	<h2>Game room: <h2 class="gameRoom"><%= roomId %></h2>
-	</h2>
-	<h3>Players:</h3>
-	<ul id="playersList">
-		<% players.forEach(player => { %>
-		<li><%= player %></li>
-		<% }); %>
-	</ul>
-	<h2>Room type: <h2 class="roomType"><%= roomType %></h2>
-	</h2>
-	<h2>Your ID: <%= socket.id %></h2>
-	<h2>Rooms:</h2>
-	<ul id="roomsList">
-		<% for (const [key, value] of Object.entries(rooms)) { %>
-		<li><%= key %></li>
-		<% }; %>
-	</ul>
+	<div class="container glass sidebar">
+		<a class="chat" onClick="toggleChat()">
+			<span class="material-symbols-rounded">
+				chat
+			</span>
+		</a>
+		<a class="chat" onClick="toggleChat()">
+			<span class="material-symbols-rounded">
+				chat
+			</span>
+		</a>
+		<a class="chat" onClick="toggleChat()">
+			<span class="material-symbols-rounded">
+				chat
+			</span>
+		</a>
+		<a class="chat" onClick="toggleChat()">
+			<span class="material-symbols-rounded">
+				chat
+			</span>
+		</a>
+		<a class="chat" onClick="toggleChat()">
+			<span class="material-symbols-rounded">
+				chat
+			</span>
+		</a>
+	</div>
+	<div class="main">
+		<div class="container glass">
+			<h1>Welcome to Quick Click</h1>
+			<div class="same">
+				<h5>Your ID: </h5><h5 class="yourId"><%= socket.id %></h5>
+			</div>
+			<div class="same">
+				<h2>Room: </h2><h2 class="gameRoom"><%= roomId %></h2> <h3>( type: </h3><h3 class="roomType"><%= roomType %></h3><h3>)</h3>
+			</div>
+			<h3>Players:</h3>
+			<ul id="playersList">
+				<% players.forEach(player => { %>
+				<li><% if (player.firstname) { %><%= player.firstname %><% } else { %>Guest<% } %><% if (player.id === socket.id) { %> (you)<% } %></li>
+				<% }); %>
+			</ul>
+			<h2>Rooms:</h2>
+			<ul id="roomsList">
+				<% for (const [key, value] of Object.entries(rooms)) { %>
+				<li><%= key %></li>
+				<% }; %>
+			</ul>
+			<button class="glass" onClick="handleJoinPublicRoom()">
+				Join a public room
+			</button>
+			<button class="glass" onClick="<% if (!session.loggedIn) { %>alert('You must be logged in to create a private room')<% } else { %>handleCreateRoom()<% } %>">
+				Create a private room
+			</button>
+			<form class="joint">
+				<input class="glass" type="text" id="roomCode" value="" placeholder="Room Code" minlength="6" maxlength="6" onChange="handleInputChange()" />
+				<button onClick="<% if (!session.loggedIn) { %>alert('You must be logged in to join a private room'); return false<% } else { %>handleJoinPrivateRoom()<% } %>">
+					Join a private room
+				</button>
+			</form>
+		</div>
+		<div class="container glass">
+		</div>
+		<div class="container glass">test</div>
+	</div>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
 		window.onerror = function(e) {
@@ -94,10 +138,14 @@
 		var roomType = '<%= roomType %>';
 		var roomCode = '';
 		var players = <%- JSON.stringify(players) %>;
+		var session = <%= JSON.stringify(session.account) %>;
 
 		socket.on('connect', () => {
 			console.log('Connected to server');
 			socket.emit('join room', roomId);
+			document.querySelectorAll(".yourId").forEach(yourId => {
+				yourId.innerText = socket.id;
+			});
 		});
 
 		socket.on('new room', (type, id) => {
@@ -115,6 +163,7 @@
 
 		function handleCreateRoom() {
 			socket.emit('create room', 'friends');
+			location.href = `/join/${roomId}`;
 		};
 
 		function handleJoinPublicRoom() {
@@ -134,7 +183,11 @@
 			playersList.innerHTML = '';
 			players.forEach((player) => {
 				var li = document.createElement('li');
-				li.innerText = player;
+				li.innerText = player.firstname || 'Guest';
+				if (player.id === socket.id) {
+					li.innerText += ' (you)';
+				};
+				console.log(li);
 				playersList.appendChild(li);
 			});
 		};

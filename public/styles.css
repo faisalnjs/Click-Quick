@@ -1,28 +1,92 @@
 html {
+    --gradient-old: linear-gradient(45deg, #0c013ea1, #25013ea1);
+    --gradient: linear-gradient(45deg, #31aff9, #b88df3);
+    --gradient-transparent: linear-gradient(45deg, #31aff9a1, #b88df3a1);
+    --solid: #ff71a9;
     font-family: 'Urbanist', sans-serif;
     scroll-behavior: smooth;
-    background: linear-gradient(45deg, #0c013e, #25013e);
+    background: var(--gradient);
     color: white;
 }
 
 body {
+    cursor: url('cursor.png'), auto;
+    background: var(--gradient);
     height: calc(100vh - 70px);
     margin: 0;
     margin-top: 70px;
     padding: 50px;
     box-sizing: border-box;
-    display: grid;
+    display: flex;
+    gap: 10px;
+}
+
+* {
+    font-family: 'Urbanist', sans-serif;
+}
+
+.glass {
+    background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.container.glass {
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 a {
     text-decoration: none;
     color: white;
+    cursor: pointer;
+}
+
+button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    background-color: var(--solid);
+    color: white;
+    padding: 0 25px;
+    height: 40px;
+    border-radius: 100px;
+    transition: 0.1s;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    background-color: var(--solid);
+    color: white;
+    transition: 0.1s;
+}
+
+input {
+    border: none;
+    outline: none;
+    background-color: var(--solid);
+    color: white;
+    padding: 0 25px;
+    height: 40px;
+    border-radius: 100px;
+    transition: 0.1s;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+ul {
+    list-style-image: url(right-small.png);
 }
 
 header {
     width: calc(100vw - 100px);
     height: 70px;
-    background: #ffffff4f;
     position: fixed;
     top: 0;
     left: 0;
@@ -44,18 +108,21 @@ header .left, header .right {
 header img {
     height: 45px;
     border-radius: 100%;
-    box-shadow: #d900ff 0px 0px 15px 0px;
 }
 
-header .back {
-    background: linear-gradient(45deg, #0c013ea1, #25013ea1);
+header a:has(span) {
     border-radius: 100%;
     height: 40px;
     width: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
+    transition: 0.1s;
+}
+
+header a:has(span):hover {
+    background-color: var(--solid);
+    transition: 0.1s;
 }
 
 header .logo {
@@ -72,7 +139,11 @@ header .tokens {
     gap: 15px;
     height: 70px;
     padding: 0 25px;
-    background: linear-gradient(45deg, #0c013ea1, #25013ea1);
+    background: var(--gradient-transparent);
+}
+
+header .tokens img {
+    box-shadow: var(--solid) 0px 0px 15px 0px;
 }
 
 header .tokens div {
@@ -84,4 +155,57 @@ header .tokens div {
 
 header .tokens div * {
     margin: 0;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding: 25px;
+    border-radius: 10px;
+}
+
+.main {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    grid-template-rows: 1fr;
+    gap: 10px;
+}
+
+.main .container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding: 25px;
+    border-radius: 10px;
+}
+
+.main .container:nth-of-type(3) {
+    grid-column: 1 / 3;
+}
+
+.main .container * {
+    margin: 0;
+}
+
+.main .container .same {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 5px;
+}
+
+.joint {
+    display: flex;
+}
+
+.joint input {
+    border-radius: 100px 0 0 100px;
+    width: 100%;
+}
+
+.joint button {
+    border-radius: 0 100px 100px 0;
+    min-width: 200px;
 }
