@@ -59,9 +59,6 @@
 			</a>
 		</div>
 	</header>
-	<% if (error != null) { %>
-	<div id="error"><%= error %></div>
-	<% } %>
 	<div class="container glass sidebar">
 		<a class="chat" onClick="toggleChat()">
 			<span class="material-symbols-rounded">
@@ -91,58 +88,74 @@
 	</div>
 	<div class="main">
 		<div class="container glass">
-			<h1>Welcome to Quick Click</h1>
-			<div class="same">
-				<h5>Your ID: </h5><h5 class="yourId"><%= socket.id %></h5>
+			<h1>Welcome to Click Quick</h1>
+			<% if (!error) { %>
+			<div class="space-between">
+				<div>
+					<div class="same">
+						<h5>Your ID: </h5>
+						<h5 class="yourId"><%= socket.id %></h5>
+					</div>
+					<div class="same">
+						<h2>Room: </h2>
+						<h2 class="roomId"><%= roomId %></h2>
+						<h3>( type: </h3>
+						<h3 class="roomType"><%= roomType %></h3>
+						<h3>)</h3>
+					</div>
+					<h3>Players:</h3>
+					<ul id="playersList">
+						<% players.forEach(player => { %>
+						<li><% if (player.firstname) { %><%= player.firstname %><% } else { %>Guest<% } %><% if (player.id === socket.id) { %> (you)<% } %></li>
+						<% }); %>
+					</ul>
+					<h2>Rooms:</h2>
+					<ul id="roomsList">
+						<% for (const [key, value] of Object.entries(rooms)) { %>
+						<li><a href="/<%= key %>"><%= key %></a></li>
+						<% }; %>
+					</ul>
+				</div>
+				<div>
+					<button class="glass" onClick="handleJoinPublicRoom()">
+						Join a public room
+					</button>
+					<button class="glass" onClick="<% if (!session.loggedIn) { %>alert('You must be logged in to create a private room')<% } else { %>handleCreateRoom()<% } %>">
+						Create a private room
+					</button>
+					<form class="joint">
+						<input class="glass" type="text" id="roomCode" value="" placeholder="Room Code" minlength="6" maxlength="6" onChange="handleInputChange()" />
+						<button onClick="<% if (!session.loggedIn) { %>alert('You must be logged in to join a private room'); return false<% } else { %>handleJoinPrivateRoom()<% } %>">
+							Join a private room
+						</button>
+					</form>
+				</div>
 			</div>
-			<div class="same">
-				<h2>Room: </h2><h2 class="gameRoom"><%= roomId %></h2> <h3>( type: </h3><h3 class="roomType"><%= roomType %></h3><h3>)</h3>
-			</div>
-			<h3>Players:</h3>
-			<ul id="playersList">
-				<% players.forEach(player => { %>
-				<li><% if (player.firstname) { %><%= player.firstname %><% } else { %>Guest<% } %><% if (player.id === socket.id) { %> (you)<% } %></li>
-				<% }); %>
-			</ul>
-			<h2>Rooms:</h2>
-			<ul id="roomsList">
-				<% for (const [key, value] of Object.entries(rooms)) { %>
-				<li><%= key %></li>
-				<% }; %>
-			</ul>
-			<button class="glass" onClick="handleJoinPublicRoom()">
-				Join a public room
-			</button>
-			<button class="glass" onClick="<% if (!session.loggedIn) { %>alert('You must be logged in to create a private room')<% } else { %>handleCreateRoom()<% } %>">
-				Create a private room
-			</button>
-			<form class="joint">
-				<input class="glass" type="text" id="roomCode" value="" placeholder="Room Code" minlength="6" maxlength="6" onChange="handleInputChange()" />
-				<button onClick="<% if (!session.loggedIn) { %>alert('You must be logged in to join a private room'); return false<% } else { %>handleJoinPrivateRoom()<% } %>">
-					Join a private room
+			<% } else { %>
+			<a href="/">
+				<button>
+					Go Home
 				</button>
-			</form>
+			</a>
+			<% } %>
 		</div>
-		<div class="container glass">
+		<div class="container glass<% if (error) { %> error<% } %>">
+			<% if (error) { %><h3><%= error %></h3><% } %>
 		</div>
 		<div class="container glass">test</div>
 	</div>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
-		window.onerror = function(e) {
-			document.getElementById('prompt').innerHTML = e.toString();
-		};
-
 		const socket = io();
 		var roomId = '<%= roomId %>';
 		var roomType = '<%= roomType %>';
 		var roomCode = '';
 		var players = <%- JSON.stringify(players) %>;
-		var session = <%= JSON.stringify(session.account) %>;
+		var session = <%- JSON.stringify(session.account) %>;
 
 		socket.on('connect', () => {
 			console.log('Connected to server');
-			socket.emit('join room', roomId);
+			socket.volatile.emit('join room', roomId);
 			document.querySelectorAll(".yourId").forEach(yourId => {
 				yourId.innerText = socket.id;
 			});
@@ -162,16 +175,18 @@
 		});
 
 		function handleCreateRoom() {
-			socket.emit('create room', 'friends');
-			location.href = `/join/${roomId}`;
+			socket.volatile.emit('create room', 'friends');
+			setTimeout(function() {
+				location.href = `/${roomId}`;
+			}, 5000);
 		};
 
 		function handleJoinPublicRoom() {
-			socket.emit('join room', 'public');
+			socket.volatile.emit('join room', 'public');
 		};
 
 		function handleJoinPrivateRoom() {
-			location.href = `/join/${roomCode}`;
+			location.href = `/${roomCode}`;
 		};
 
 		function handleInputChange() {
@@ -184,6 +199,7 @@
 			players.forEach((player) => {
 				var li = document.createElement('li');
 				li.innerText = player.firstname || 'Guest';
+				console.log(player);
 				if (player.id === socket.id) {
 					li.innerText += ' (you)';
 				};
@@ -193,8 +209,11 @@
 		};
 
 		function updateRoom() {
-			document.querySelectorAll('.gameRoom').forEach(gameRoom => {
-				gameRoom.innerText = roomId;
+			document.querySelectorAll('.roomId').forEach(roomId => {
+				roomId.innerText = roomId;
+			});
+			document.querySelectorAll('.roomType').forEach(roomType => {
+				roomType.innerText = roomType;
 			});
 		};
 	</script>

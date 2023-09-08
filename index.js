@@ -10,7 +10,7 @@ app.use(express.static('public'));
 const sessionMiddleware = session({
   name: 'sessionid',
   secret: 'FAISALN.CQ',
-  resave: true,
+  resave: false,
   saveUninitialized: false,
   cookie: { maxAge: 86400000 }
 });
@@ -23,36 +23,23 @@ var roomId = 'public';
 var roomType = 'public';
 
 function allRoutes(req) {
-  if (!userSession.account) {
+  if (!req.session.account) {
     if (process.env.NODE_ENV === "production") {
-      userSession.account = [];
+      req.session.account = [];
     } else {
-      userSession.account = [];
-    }
+      req.session.account = [];
+    };
   };
 };
 
 app.get('/', (req, res) => {
   allRoutes(req);
-  res.render('index', { roomId, roomType, rooms, players: rooms.public || [], socket: io, error: null, session: userSession });
-});
-
-app.get('/join/:roomId', (req, res) => {
-  allRoutes(req);
-  if (req.params.roomId) {
-    if (rooms[req.params.roomId]) {
-      res.render('index', { roomId: req.params.roomId, roomType: 'friends', rooms, players: rooms[roomId] || [], socket: io, error: null, session: userSession });
-    } else {
-      res.render('index', { roomId, roomType, rooms, players: rooms.public || [], socket: io, error: "Room does not exist", session: userSession });
-    };
-  } else {
-    res.redirect('/');
-  };
+  res.render('index', { roomId: 'public', roomType: 'public', rooms, players: rooms.public || [], socket: io, error: null, session: req.session });
 });
 
 app.get("/login", async (req, res) => {
   allRoutes(req);
-  if (userSession.loggedIn === true) {
+  if (req.session.loggedIn === true) {
     res.redirect('/')
   } else {
     res.redirect(`https://my.dangoweb.com/?auth=true&redirect=http://${req.hostname}/sso&faisaln=true`)
@@ -72,8 +59,9 @@ app.get("/sso", async (req, res) => {
       .then(sso => sso.json())
       .then(sso => {
         if (sso.username) {
-          userSession.loggedIn = true;
-          userSession.account = {
+          console.log(`${sso.username} logged in`)
+          req.session.loggedIn = true;
+          req.session.account = {
             username: sso.username,
             email: sso.email,
             firstname: sso.firstname,
@@ -83,6 +71,9 @@ app.get("/sso", async (req, res) => {
             dangos: sso.dangos,
             blocked: sso.blocked
           };
+        } else {
+          console.log(sso);
+          console.log("Failed login");
         };
         res.redirect('/');
       });
@@ -92,16 +83,30 @@ app.get("/sso", async (req, res) => {
 });
 
 app.get("/logout", (req, res) => {
-  const sessionId = userSession.id;
-  userSession.destroy(() => {
+  const sessionId = req.session.id;
+  req.session.destroy(() => {
     io.in(sessionId).disconnectSockets();
     res.redirect('/');
   });
 });
 
+app.get('/:roomId', (req, res) => {
+  allRoutes(req);
+  console.log(`Attempting to join ${req.params.roomId}`);
+  if (req.params.roomId) {
+    if (rooms[req.params.roomId]) {
+      res.render('index', { roomId: req.params.roomId, roomType: 'friends', rooms, players: rooms[roomId] || [], socket: io, error: null, session: req.session });
+    } else {
+      console.log(`Room ${req.params.roomId} does not exist`);
+      res.render('index', { roomId, roomType, rooms, players: rooms.public || [], socket: io, error: "Room does not exist", session: req.session });
+    };
+  } else {
+    res.redirect('/');
+  };
+});
+
 io.on('connection', (socket) => {
   userSession = socket.request.session;
-  console.log('Connected to server!');
 
   socket.on('create room', () => {
     var IDX = 36, HEX = '';
@@ -118,10 +123,14 @@ io.on('connection', (socket) => {
   });
 
   socket.on('join room', (roomId) => {
-    console.log(`New User: ${socket.id} -> ${roomId}`);
+    console.log(`New User: ${socket.id} (${userSession.username || 'Guest'}) -> ${roomId}`);
     if (roomId === 'public') {
-      var user = userSession.account || { role: 'guest', blocked: 0 };
+      if (!userSession.account) {
+        userSession.account = [];
+      };
+      var user = (userSession.account.length === 0) ? { role: 'guest', blocked: 0 } : userSession.account;
       user.id = socket.id;
+      userSession.account = user;
       if (!JSON.stringify(rooms[roomId]).includes(socket.id)) {
         rooms.public.push(user);
       };
@@ -139,6 +148,9 @@ io.on('connection', (socket) => {
     var list = [];
     if (rooms[roomId]) {
       rooms[roomId].forEach((player) => {
+        if (!player.id) {
+          console.log(player);
+        };
         if (player.id != socket.id) {
           list.push(player);
         };
