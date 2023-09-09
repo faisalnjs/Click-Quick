@@ -4,3 +4,5 @@ Click Quick, an online single-player or multiplayer game where one has to compet
 
 - [ ] Multiplayer
 - [ ] Play against AI
+- [ ] Mobile Version
+- [ ] Logout (frontend)
