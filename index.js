@@ -69,7 +69,8 @@ app.get("/sso", async (req, res) => {
             role: sso.role,
             profileimg: sso.profileimg,
             dangos: sso.dangos,
-            blocked: sso.blocked
+            blocked: sso.blocked,
+            points: 0
           };
         } else {
           console.log(sso);
@@ -128,7 +129,7 @@ io.on('connection', (socket) => {
       if (!userSession.account) {
         userSession.account = [];
       };
-      var user = (userSession.account.length === 0) ? { role: 'guest', blocked: 0 } : userSession.account;
+      var user = (userSession.account.length === 0) ? { role: 'guest', blocked: 0, points: 0 } : userSession.account;
       user.id = socket.id;
       userSession.account = user;
       if (!JSON.stringify(rooms[roomId]).includes(socket.id)) {
@@ -175,6 +176,28 @@ io.on('connection', (socket) => {
         };
       });
     };
+  });
+
+  socket.on('rpoint', () => {
+    Object.keys(rooms).forEach(roomId => {
+      rooms[roomId].forEach(player => {
+        if (player.id === socket.id) {
+          player.points--;
+          io.to(roomId).emit('update players', rooms[roomId] || []);
+        };
+      });
+    });
+  });
+
+  socket.on('point', (points) => {
+    Object.keys(rooms).forEach(roomId => {
+      rooms[roomId].forEach(player => {
+        if (player.id === socket.id) {
+          player.points = player.points + points;
+          io.to(roomId).emit('update players', rooms[roomId] || []);
+        };
+      });
+    });
   });
 });
 

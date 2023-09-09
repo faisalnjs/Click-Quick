@@ -7,7 +7,7 @@
 	<meta name="theme-color" content="#d900ff" />
 	<title>Click Quick</title>
 	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
-	<link rel="apple-touch-icon" sizes="76x76" href="../apple-icon.png" />
+	<link rel="apple-touch-icon" sizes="76x76" href="../apple-touch-icon.png" />
 	<link rel="android-chrome-192x192" href="../android-icon-192x192.png" />
 	<link rel="android-chrome-512x512" href="../android-icon-512x512.png" />
 	<link rel="stylesheet" href="../styles.css" />
@@ -36,14 +36,9 @@
 			</a>
 		</div>
 		<div class="right">
-			<a class="chat glass" onClick="toggleChat()">
+			<a class="glass" href="https://discord.gg/QGKJGADy3B">
 				<span class="material-symbols-rounded">
-					chat
-				</span>
-			</a>
-			<a class="notifications glass" onClick="toggleNotifications()">
-				<span class="material-symbols-rounded">
-					notifications
+					headset_mic
 				</span>
 			</a>
 			<% if (!session.loggedIn) { %>
@@ -54,35 +49,13 @@
 			<a href="/">
 				<button>Play as <% if (session.account.firstname) { %><%= session.account.firstname %><% } else { %>Guest<% } %></button>
 			</a>
-			<a class="user" onClick="toggleProfile()">
-				<img src="<% if (session.account.profileimg) { %><%= session.account.profileimg %><% } else { %>../../user.jpeg<% } %>" />
-			</a>
+			<img src="<% if (session.account.profileimg) { %><%= session.account.profileimg %><% } else { %>../../user.jpeg<% } %>" />
 		</div>
 	</header>
 	<div class="container glass sidebar">
-		<a class="chat" onClick="toggleChat()">
+		<a href="https://discord.gg/QGKJGADy3B">
 			<span class="material-symbols-rounded">
-				chat
-			</span>
-		</a>
-		<a class="chat" onClick="toggleChat()">
-			<span class="material-symbols-rounded">
-				chat
-			</span>
-		</a>
-		<a class="chat" onClick="toggleChat()">
-			<span class="material-symbols-rounded">
-				chat
-			</span>
-		</a>
-		<a class="chat" onClick="toggleChat()">
-			<span class="material-symbols-rounded">
-				chat
-			</span>
-		</a>
-		<a class="chat" onClick="toggleChat()">
-			<span class="material-symbols-rounded">
-				chat
+				headset_mic
 			</span>
 		</a>
 	</div>
@@ -118,7 +91,7 @@
 				</div>
 				<div>
 					<button class="glass" onClick="handleJoinPublicRoom()">
-						Join a public room
+						Join public room
 					</button>
 					<button class="glass" onClick="<% if (!session.loggedIn) { %>alert('You must be logged in to create a private room')<% } else { %>handleCreateRoom()<% } %>">
 						Create a private room
@@ -140,9 +113,36 @@
 			<% } %>
 		</div>
 		<div class="container glass<% if (error) { %> error<% } %>">
-			<% if (error) { %><h3><%= error %></h3><% } %>
+			<% if (error) { %>
+			<h3><%= error %></h3>
+			<% } else { %>
+			<div class="game">
+				<div class="inner">
+					<div class="box glass">1</div>
+					<div class="box glass">2</div>
+					<div class="box glass">3</div>
+					<div class="box glass">4</div>
+					<div class="box glass">5</div>
+					<div class="box glass">6</div>
+					<div class="box glass">7</div>
+					<div class="box glass">8</div>
+					<div class="box glass">9</div>
+					<div class="box glass">10</div>
+					<div class="box glass">11</div>
+					<div class="box glass">12</div>
+					<div class="box glass">13</div>
+					<div class="box glass">14</div>
+					<div class="box glass">15</div>
+					<div class="box glass">16</div>
+				</div>
+			</div>
+			<div>
+				<button onClick="startGame()">Start Game (1 token)</button>
+				<button onClick="stopGame()">Stop Game & Claim Tokens</button>
+				<button onClick="clearGame()">Clear Game</button>
+			</div>
+			<% } %>
 		</div>
-		<div class="container glass">test</div>
 	</div>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
@@ -152,71 +152,47 @@
 		var roomCode = '';
 		var players = <%- JSON.stringify(players) %>;
 		var session = <%- JSON.stringify(session.account) %>;
-
-		socket.on('connect', () => {
-			console.log('Connected to server');
-			socket.volatile.emit('join room', roomId);
-			document.querySelectorAll(".yourId").forEach(yourId => {
-				yourId.innerText = socket.id;
-			});
-		});
-
-		socket.on('new room', (type, id) => {
-			console.log(`New ${type} room created with ID ${id}`);
-			roomType = type;
-			roomId = id;
-			updateRoom();
-		});
-
-		socket.on('update players', (updatedPlayers) => {
-			console.log('Player list updated', updatedPlayers);
-			players = updatedPlayers;
-			renderPlayers();
-		});
-
-		function handleCreateRoom() {
-			socket.volatile.emit('create room', 'friends');
-			setTimeout(function() {
-				location.href = `/${roomId}`;
-			}, 5000);
-		};
-
-		function handleJoinPublicRoom() {
-			socket.volatile.emit('join room', 'public');
-		};
-
-		function handleJoinPrivateRoom() {
-			location.href = `/${roomCode}`;
-		};
-
-		function handleInputChange() {
-			roomCode = document.getElementById('roomCode').value;
-		};
-
-		function renderPlayers() {
-			var playersList = document.getElementById('playersList');
-			playersList.innerHTML = '';
-			players.forEach((player) => {
-				var li = document.createElement('li');
-				li.innerText = player.firstname || 'Guest';
-				console.log(player);
-				if (player.id === socket.id) {
-					li.innerText += ' (you)';
-				};
-				console.log(li);
-				playersList.appendChild(li);
-			});
-		};
-
-		function updateRoom() {
-			document.querySelectorAll('.roomId').forEach(roomId => {
-				roomId.innerText = roomId;
-			});
-			document.querySelectorAll('.roomType').forEach(roomType => {
-				roomType.innerText = roomType;
-			});
-		};
+		var color = '';
+		var colors = [{
+				color: 'purple',
+				hex: 'a97fda',
+				rgb: 'rgb(169, 127, 218)'
+			},
+			{
+				color: 'blue',
+				hex: '5593e3',
+				rgb: 'rgb(85, 147, 227)'
+			},
+			{
+				color: 'pink',
+				hex: 'ff7eba',
+				rgb: 'rgb(255, 126, 186)'
+			},
+			{
+				color: 'cyan',
+				hex: '8dd5fd',
+				rgb: 'rgb(141, 213, 253)'
+			},
+			{
+				color: 'green',
+				hex: 'c6e7cc',
+				rgb: 'rgb(198, 231, 204)'
+			},
+			{
+				color: 'yellow',
+				hex: 'fce690',
+				rgb: 'rgb(252, 230, 144)'
+			}
+		];
+		var newColor = {};
+		var t = 0;
+		var wanted = document.querySelectorAll('.main .container .game .inner .box').length;
+		var have = 0;
+		var running = false;
+		var acquiredTokens = 0;
+		var ofColor = [];
 	</script>
+	<script src="../scripts.js"></script>
 </body>
 
 </html>

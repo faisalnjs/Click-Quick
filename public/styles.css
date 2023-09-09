@@ -10,7 +10,7 @@ html {
 }
 
 body {
-    cursor: url('cursor.png'), auto;
+    cursor: url('cursor.cur'), auto;
     background: var(--gradient);
     min-height: calc(100vh - 70px);
     margin: 0;
@@ -170,6 +170,20 @@ header .tokens div * {
     border-radius: 10px;
 }
 
+.joint {
+    display: flex;
+}
+
+.joint input {
+    border-radius: 100px 0 0 100px;
+    width: 100%;
+}
+
+.joint button {
+    border-radius: 0 100px 100px 0;
+    min-width: 200px;
+}
+
 .main {
     width: 100%;
     display: grid;
@@ -215,6 +229,7 @@ header .tokens div * {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: 25px;
     height: 100%;
 }
 
@@ -224,16 +239,46 @@ header .tokens div * {
     gap: 15px;
 }
 
-.joint {
+.main .container .game {
+    height: 500px;
+    width: 500px;
     display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 5px solid var(--solid);
+    border-radius: 25px;
 }
 
-.joint input {
-    border-radius: 100px 0 0 100px;
-    width: 100%;
+.main .container .game .inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    gap: 5px;
+    border-radius: 15px;
+    width: 95%;
+    height: 95%;
+    transition: 0.5s;
 }
 
-.joint button {
-    border-radius: 0 100px 100px 0;
-    min-width: 200px;
+.main .container .game .inner .box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none;
+}
+
+.main .container .game .inner .box:nth-of-type(1) {
+    border-radius: 15px 0 0 0;
+}
+
+.main .container .game .inner .box:nth-of-type(4) {
+    border-radius: 0 15px 0 0;
+}
+
+.main .container .game .inner .box:nth-of-type(13) {
+    border-radius: 0 0 0 15px;
+}
+
+.main .container .game .inner .box:nth-of-type(16) {
+    border-radius: 0 0 15px 0;
 }
